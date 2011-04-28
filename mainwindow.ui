@@ -145,16 +145,6 @@
      <string>Max grandeur map :</string>
     </property>
    </widget>
-   <widget class="QListView" name="lbParties">
-    <property name="geometry">
-     <rect>
-      <x>310</x>
-      <y>40</y>
-      <width>391</width>
-      <height>181</height>
-     </rect>
-    </property>
-   </widget>
    <widget class="QPushButton" name="btnKick">
     <property name="geometry">
      <rect>
@@ -179,6 +169,16 @@
     </property>
     <property name="text">
      <string>Appliquer les modifications</string>
+    </property>
+   </widget>
+   <widget class="QListWidget" name="lbParties">
+    <property name="geometry">
+     <rect>
+      <x>310</x>
+      <y>40</y>
+      <width>391</width>
+      <height>181</height>
+     </rect>
     </property>
    </widget>
   </widget>
