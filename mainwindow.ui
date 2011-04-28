@@ -6,38 +6,25 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>309</width>
-    <height>291</height>
+    <width>716</width>
+    <height>287</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="QPushButton" name="btnDemarrer">
+   <widget class="QPushButton" name="btnDemarrerArreter">
     <property name="geometry">
      <rect>
-      <x>18</x>
-      <y>200</y>
-      <width>81</width>
+      <x>310</x>
+      <y>10</y>
+      <width>281</width>
       <height>27</height>
      </rect>
     </property>
     <property name="text">
-     <string>Démarrer</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="btnArreter">
-    <property name="geometry">
-     <rect>
-      <x>210</x>
-      <y>200</y>
-      <width>81</width>
-      <height>27</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Arrêter</string>
+     <string>Accepter/Refuser Nouvelles Connections</string>
     </property>
    </widget>
    <widget class="QLineEdit" name="txtPort">
@@ -89,7 +76,7 @@
      <string>255.255.255.255</string>
     </property>
    </widget>
-   <widget class="QLineEdit" name="lineEdit_2">
+   <widget class="QLineEdit" name="txtMaxParties">
     <property name="geometry">
      <rect>
       <x>180</x>
@@ -99,7 +86,7 @@
      </rect>
     </property>
    </widget>
-   <widget class="QLineEdit" name="lineEdit_3">
+   <widget class="QLineEdit" name="txtMaxJoueurs">
     <property name="geometry">
      <rect>
       <x>180</x>
@@ -109,7 +96,7 @@
      </rect>
     </property>
    </widget>
-   <widget class="QLineEdit" name="lineEdit_4">
+   <widget class="QLineEdit" name="txtMaxSizeMap">
     <property name="geometry">
      <rect>
       <x>180</x>
@@ -150,12 +137,48 @@
      <rect>
       <x>30</x>
       <y>164</y>
-      <width>141</width>
+      <width>131</width>
       <height>20</height>
      </rect>
     </property>
     <property name="text">
-     <string>Max grandeur maps :</string>
+     <string>Max grandeur map :</string>
+    </property>
+   </widget>
+   <widget class="QListView" name="lbParties">
+    <property name="geometry">
+     <rect>
+      <x>310</x>
+      <y>40</y>
+      <width>391</width>
+      <height>181</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btnKick">
+    <property name="geometry">
+     <rect>
+      <x>610</x>
+      <y>10</y>
+      <width>93</width>
+      <height>27</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Kick</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btnAppliquer">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>195</y>
+      <width>201</width>
+      <height>27</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Appliquer les modifications</string>
     </property>
    </widget>
   </widget>
@@ -164,7 +187,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>309</width>
+     <width>716</width>
      <height>23</height>
     </rect>
    </property>
