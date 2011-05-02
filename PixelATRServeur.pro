@@ -4,15 +4,18 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui network
 
 TARGET = PixelATRServeur
 TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp
+        mainwindow.cpp \
+    thjoueurs.cpp
 
-HEADERS  += mainwindow.h
+HEADERS  += mainwindow.h \
+    NameSpace.h \
+    thjoueurs.h
 
 FORMS    += mainwindow.ui

@@ -1,11 +1,9 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <NameSpace.h>
 #include <QMainWindow>
-
-namespace Ui {
-    class MainWindow;
-}
+#include <QtNetwork>
 
 class MainWindow : public QMainWindow
 {
@@ -17,6 +15,16 @@ public:
 
 private:
     Ui::MainWindow *ui;
+    QTcpServer *TCPServeur;
+    QThread *tempthread;
+
+signals:
+    void GamesRequestReply(thJoueurs *, QString);
+
+private slots:
+    void TCPServeur_NewConnection();
+    void CloseThreads(thJoueurs *Thread);
+    void thJoueurs_GamesRequest(thJoueurs *);
 };
 
 #endif // MAINWINDOW_H
