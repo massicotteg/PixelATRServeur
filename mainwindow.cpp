@@ -12,12 +12,22 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->lbParties->addItem("Allo");
     ui->lbParties->addItem("Allo2");
+
+    Parties = QList<thJeu *>();
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
     delete TCPServeur;
+}
+
+thJeu *MainWindow::SearchGame(QString Nom)
+{
+    int I = 0;
+    while (I < Parties.count() && Parties[I]->NomPartie == Nom)
+        I++;
+    return Parties[I];
 }
 
 void MainWindow::TCPServeur_NewConnection()
@@ -28,6 +38,21 @@ void MainWindow::TCPServeur_NewConnection()
     connect(this, SIGNAL(GamesRequestReply(thJoueurs *, QString)), tempthread, SLOT(GamesRequestReply(thJoueurs *, QString)));
 }
 
+void MainWindow::GameCreate(QList<QByteArray>Data)
+{
+    Parties.append(new thJeu(Data));
+}
+void MainWindow::GameJoin(thJoueurs *Joueur, QList<QByteArray> Data)
+{
+    Joueur->Partie = SearchGame(Data[1]);
+    Joueur->Partie->Joueurs.append(Data[0]);
+
+    connect(Joueur->Partie, SIGNAL(GameBegin()), Joueur, SLOT(GameBegin()));
+    connect(Joueur->Partie, SIGNAL(SendGameSData(thJeu*,QByteArray)), Joueur, SLOT(GameSData(thJeu*,QByteArray)));
+    connect(Joueur, SIGNAL(GameQuit(QString)), Joueur->Partie, SLOT(ExcludePlayer(QString)));
+    //connect(Joueur, SIGNAL(SetReady(QString)), Joueur->Partie, SLOT());
+    //connect(Joueur, SIGNAL(GameData(QString,QByteArray)), Joueur->Partie, SLOT());
+}
 void MainWindow::thJoueurs_GamesRequest(thJoueurs *Thread)
 {
    QString Parties = "";
@@ -36,7 +61,7 @@ void MainWindow::thJoueurs_GamesRequest(thJoueurs *Thread)
    emit GamesRequestReply(Thread, Parties);
 }
 
-void MainWindow::CloseThreads(thJoueurs *Thread)
+void MainWindow::CloseThreads(QThread *Thread)
 {
     delete Thread;
 }
