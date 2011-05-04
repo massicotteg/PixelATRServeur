@@ -2,6 +2,8 @@
 #define MAINWINDOW_H
 
 #include <NameSpace.h>
+#include <ui_mainwindow.h>
+#include <thjoueurs.h>
 #include <QMainWindow>
 #include <QtNetwork>
 

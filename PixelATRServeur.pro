@@ -12,10 +12,12 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    thjoueurs.cpp
+    thjoueurs.cpp \
+    thjeu.cpp
 
 HEADERS  += mainwindow.h \
     NameSpace.h \
-    thjoueurs.h
+    thjoueurs.h \
+    thjeu.h
 
 FORMS    += mainwindow.ui

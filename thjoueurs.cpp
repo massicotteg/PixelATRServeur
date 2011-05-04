@@ -1,4 +1,4 @@
-#include "thjoueurs.h"
+#include <thjoueurs.h>
 
 thJoueurs::thJoueurs(QObject *parent, QTcpSocket *socketClient) :
     QThread(parent)
@@ -12,19 +12,24 @@ thJoueurs::thJoueurs(QObject *parent, QTcpSocket *socketClient) :
 void thJoueurs::SocketClient_ReadyRead()
 {
     QByteArray Data = SocketClient->readAll();
-    if (Data[0] == (char)0)
-        emit GamesRequest(this);
-    else
-        if (Data[0] == (char)1)
+    switch (Data[0])
+    {
+        case thJeu::GameCData:
+            emit GameData(this);
+            break;
+        case thJeu::GamesRequest:
+            emit GamesRequest(this);
+            break;
+        case thJeu::GameSetReady:
+            emit SetReady(this);
+            break;
+        case thJeu::GameJoin:
+            emit JoinRequest(this);
+            break;
+        case thJeu::GameCreate:
             emit CreateRequest(this);
-        else
-            if (Data[0] == (char)2)
-                emit JoinRequest(this);
-            else
-                if (Data[0] == (char)3)
-                    emit SetReady(this);
-                else
-                    emit GameData(this);
+            break;
+    }
 }
 
 void thJoueurs::GamesRequestReply(thJoueurs *sender, QString Reply)
@@ -32,7 +37,40 @@ void thJoueurs::GamesRequestReply(thJoueurs *sender, QString Reply)
     if (this == sender)
     {
         QByteArray reply;
+        reply.append(thJeu::GamesReply);
         reply.append(Reply);
+        SocketClient->write(reply);
+    }
+}
+
+void thJoueurs::PlayersReply(thJoueurs *sender, QString Reply)
+{
+    if (this == sender)
+    {
+        QByteArray reply;
+        reply.append((char)1 + Reply);
+        SocketClient->write(reply);
+    }
+}
+
+void thJoueurs::GameBegin(int NoPartie)
+{
+    if (NoPartie == 1)
+        SocketClient->write(QByteArray(1, (char)2));
+}
+
+void thJoueurs::GameEnd(int NoPartie)
+{
+    if (NoPartie == 1)
+        SocketClient->write(QByteArray(1, (char)4));
+}
+
+void thJoueurs::GameSData(int NoPartie, QByteArray Data)
+{
+    if (NoPartie == 1)
+    {
+        QByteArray reply = QByteArray(1, (char)3);
+        reply.append(Data);
         SocketClient->write(reply);
     }
 }

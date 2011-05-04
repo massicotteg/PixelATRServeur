@@ -1,6 +1,8 @@
 #ifndef THJOUEURS_H
 #define THJOUEURS_H
 
+#include <NameSpace.h>
+#include <thjeu.h>
 #include <QThread>
 #include <QtNetwork>
 
@@ -25,6 +27,11 @@ public slots:
     void SocketClient_ReadyRead();
     void SocketClient_Disconnected();
     void GamesRequestReply(thJoueurs *, QString);
+
+    void PlayersReply(thJoueurs *, QString);
+    void GameBegin(int);
+    void GameEnd(int);
+    void GameSData(int, QByteArray);
 };
 
 #endif // THJOUEURS_H
