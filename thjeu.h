@@ -2,6 +2,7 @@
 #define THJEU_H
 
 #include <NameSpace.h>
+#include <QTimer>
 #include <QThread>
 
 class thJeu : public QThread
@@ -13,17 +14,21 @@ public:
     int NoMap;
     QList<QString> Joueurs;
     QList<bool> Ready;
+    QTimer *tPlayersUpdate;
 
 private:
     int SearchPlayer(QString);
 
 signals:
-    void SendGameSData(thJeu *, QByteArray);
+    void SendGameSData(QByteArray);
     void GameBegin();
+    void PlayersUpdate(QByteArray);
 
 public slots:
     void ExcludePlayer(QString);
     void CumReady(QString);
+    void tPlayersUpdate_Timeout();
+    void PlayersData(QString, QByteArray);
 };
 
 #endif // THJEU_H

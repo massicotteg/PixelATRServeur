@@ -19,10 +19,7 @@ void thJoueurs::SocketClient_ReadyRead()
             emit GameData(Nom, Data.remove(0, 1));
             break;
         case Ui::GamesRequest:
-            if (GameAssigned)
-                emit PlayersRequest(this, Partie);
-            else
-                emit GamesRequest(this);
+            emit GamesRequest(this);
             break;
         case Ui::GameSetReady:
             emit SetReady(Nom);
@@ -80,5 +77,11 @@ void thJoueurs::GameSData(QByteArray Data)
 
 void thJoueurs::SocketClient_Disconnected()
 {
+    emit GameQuit(Nom);
     emit Disconnected((this));
+}
+
+void thJoueurs::PlayersUpdate(QByteArray PlayersList)
+{
+    SocketClient->write(PlayersList);
 }

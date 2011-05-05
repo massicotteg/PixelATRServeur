@@ -20,7 +20,7 @@ public:
 private:
     Ui::MainWindow *ui;
     QTcpServer *TCPServeur;
-    QThread *tempthread;
+    thJoueurs *tempthread;
     thJeu *SearchGame(QString);
 
 signals:

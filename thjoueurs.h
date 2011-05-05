@@ -19,9 +19,8 @@ private:
     bool GameAssigned;
 
 signals:
-    void Disconnected(thJoueurs *);
+    void Disconnected(QThread *);
     void GamesRequest(thJoueurs *);
-    void PlayersRequest(thJoueurs *, thJeu *);
     void CreateRequest(QList<QByteArray>);
     void JoinRequest(thJoueurs *, QList<QByteArray>);
     void SetReady(QString);
@@ -37,6 +36,8 @@ public slots:
     void GameBegin();
     void GameEnd();
     void GameSData(QByteArray);
+
+    void PlayersUpdate(QByteArray);
 };
 
 #endif // THJOUEURS_H
