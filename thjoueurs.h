@@ -2,7 +2,6 @@
 #define THJOUEURS_H
 
 #include <NameSpace.h>
-#include <thjeu.h>
 #include <QThread>
 #include <QtNetwork>
 
@@ -11,8 +10,8 @@ class thJoueurs : public QThread
     Q_OBJECT
 public:
     explicit thJoueurs(QObject *parent = 0, QTcpSocket *socketClient=0);
+    ~thJoueurs();
     QString Nom;
-    thJeu *Partie;
 
 private:
     QTcpSocket *SocketClient;
@@ -20,6 +19,7 @@ private:
 
 signals:
     void Disconnected(QThread *);
+
     void GamesRequest(thJoueurs *);
     void CreateRequest(QList<QByteArray>);
     void JoinRequest(thJoueurs *, QList<QByteArray>);
@@ -32,12 +32,11 @@ public slots:
     void SocketClient_Disconnected();
     void GamesRequestReply(thJoueurs *, QString);
 
+    void PlayersUpdate(QByteArray);
     void PlayersReply(thJoueurs *, QString);
     void GameBegin();
     void GameEnd();
     void GameSData(QByteArray);
-
-    void PlayersUpdate(QByteArray);
 };
 
 #endif // THJOUEURS_H

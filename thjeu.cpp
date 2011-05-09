@@ -39,8 +39,13 @@ void thJeu::CumReady(QString Player)
         BeginReady = Ready[I];
         I++;
     }
-    if (I == Ready.count() && I > 2)
+    if (I == Ready.count() && I > 1)
+    {
         emit GameBegin();
+        tPlayersUpdate->stop();
+        delete tPlayersUpdate;
+        start();
+    }
 }
 
 void thJeu::tPlayersUpdate_Timeout()
@@ -51,7 +56,21 @@ void thJeu::tPlayersUpdate_Timeout()
     emit PlayersUpdate(PlayersList);
 }
 
+void thJeu::EndGame(QString Partie)
+{
+    if (NomPartie == Partie)
+    {
+        emit GameEnd();
+        emit Destroy(this);
+    }
+}
+
 void thJeu::PlayersData(QString PlayerName, QByteArray Data)
+{
+
+}
+
+void thJeu::run()
 {
 
 }

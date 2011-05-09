@@ -146,6 +146,9 @@
     </property>
    </widget>
    <widget class="QPushButton" name="btnKick">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>610</x>
@@ -161,9 +164,9 @@
    <widget class="QPushButton" name="btnAppliquer">
     <property name="geometry">
      <rect>
-      <x>50</x>
-      <y>195</y>
-      <width>201</width>
+      <x>120</x>
+      <y>190</y>
+      <width>181</width>
       <height>27</height>
      </rect>
     </property>
@@ -179,6 +182,19 @@
       <width>391</width>
       <height>181</height>
      </rect>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btnDemarrer">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>190</y>
+      <width>93</width>
+      <height>27</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Démarrer</string>
     </property>
    </widget>
   </widget>

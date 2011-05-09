@@ -9,6 +9,11 @@ thJoueurs::thJoueurs(QObject *parent, QTcpSocket *socketClient) :
 
     GameAssigned = false;
 }
+thJoueurs::~thJoueurs()
+{
+    if (Nom != "")
+        emit GameQuit(Nom);
+}
 
 void thJoueurs::SocketClient_ReadyRead()
 {
@@ -40,7 +45,7 @@ void thJoueurs::SocketClient_ReadyRead()
 
 void thJoueurs::GamesRequestReply(thJoueurs *sender, QString Reply)
 {
-    if (this == sender)
+    if (this == sender || sender == 0)
     {
         QByteArray reply = QByteArray(1, Ui::GamesReply);
         reply.append(Reply);
@@ -77,11 +82,11 @@ void thJoueurs::GameSData(QByteArray Data)
 
 void thJoueurs::SocketClient_Disconnected()
 {
-    emit GameQuit(Nom);
     emit Disconnected((this));
 }
 
 void thJoueurs::PlayersUpdate(QByteArray PlayersList)
 {
     SocketClient->write(PlayersList);
+    SocketClient->waitForBytesWritten();
 }

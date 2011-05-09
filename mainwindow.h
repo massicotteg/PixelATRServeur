@@ -3,6 +3,7 @@
 
 #include <NameSpace.h>
 #include <ui_mainwindow.h>
+#include <thjeu.h>
 #include <thjoueurs.h>
 #include <QMainWindow>
 #include <QtNetwork>
@@ -22,16 +23,25 @@ private:
     QTcpServer *TCPServeur;
     thJoueurs *tempthread;
     thJeu *SearchGame(QString);
+    bool AcceptNewConnections;
+    QString SelectedGame;
 
 signals:
     void GamesRequestReply(thJoueurs *, QString);
+    void KickGame(QString);
 
 private slots:
     void TCPServeur_NewConnection();
     void CloseThreads(QThread *Thread);
+
     void thJoueurs_GamesRequest(thJoueurs *);
     void GameCreate(QList<QByteArray>);
     void GameJoin(thJoueurs *, QList<QByteArray>);
+    void on_btnAppliquer_clicked();
+    void on_btnDemarrer_clicked();
+    void on_btnDemarrerArreter_clicked();
+    void on_btnKick_clicked();
+    void on_lbParties_currentRowChanged(int currentRow);
 };
 
 #endif // MAINWINDOW_H

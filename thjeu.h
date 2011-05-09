@@ -18,17 +18,22 @@ public:
 
 private:
     int SearchPlayer(QString);
+    void run();
 
 signals:
-    void SendGameSData(QByteArray);
-    void GameBegin();
+    void Destroy(QThread *);
+
     void PlayersUpdate(QByteArray);
+    void GameBegin();
+    void GameEnd();
+    void SendGameSData(QByteArray);
 
 public slots:
     void ExcludePlayer(QString);
     void CumReady(QString);
     void tPlayersUpdate_Timeout();
     void PlayersData(QString, QByteArray);
+    void EndGame(QString);
 };
 
 #endif // THJEU_H
