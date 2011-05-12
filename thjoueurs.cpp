@@ -30,15 +30,14 @@ void thJoueurs::SocketClient_ReadyRead()
             emit SetReady(Nom);
             break;
         case Ui::GameJoin:
-            emit JoinRequest(this, Data.remove(0,1).split('\n'));
+            if (!GameAssigned)
+                emit JoinRequest(this, Data.remove(0,1).split('\n'));
             break;
         case Ui::GameCreate:
             emit CreateRequest(Data.remove(0,1).split('\n'));
             break;
         case Ui::GameQuit:
             emit GameQuit(Nom);
-            Nom = "";
-            GameAssigned = false;
             break;
     }
 }
@@ -70,6 +69,7 @@ void thJoueurs::GameBegin()
 
 void thJoueurs::GameEnd()
 {
+    GameAssigned = false;
     SocketClient->write(QByteArray(1, Ui::GameEnd));
 }
 

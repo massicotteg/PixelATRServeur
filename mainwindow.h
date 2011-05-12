@@ -29,6 +29,8 @@ private:
 signals:
     void GamesRequestReply(thJoueurs *, QString);
     void KickGame(QString);
+    void PlayerAdded();
+    void EndGame();
 
 private slots:
     void TCPServeur_NewConnection();

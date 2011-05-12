@@ -7,16 +7,12 @@ thJeu::thJeu(QList<QByteArray> InitData, QObject *parent) :
     InitData[1].number(NoMap);
     Joueurs = QList<QString>();
     Ready = QList<bool>();
-
-    tPlayersUpdate = new QTimer();
-    connect(tPlayersUpdate, SIGNAL(timeout()), this, SLOT(tPlayersUpdate_Timeout()));
-    tPlayersUpdate->start(500);
 }
 
 int thJeu::SearchPlayer(QString Player)
 {
     int I = 0;
-    while (Joueurs[I] != Player)
+    while (I < Joueurs.count() && Joueurs[I] != Player)
            I++;
     return I;
 }
@@ -42,13 +38,12 @@ void thJeu::CumReady(QString Player)
     if (I == Ready.count() && I > 1)
     {
         emit GameBegin();
-        tPlayersUpdate->stop();
-        delete tPlayersUpdate;
         start();
     }
+    PlayersUpdate();
 }
 
-void thJeu::tPlayersUpdate_Timeout()
+void thJeu::PlayersUpdate()
 {
     QByteArray PlayersList = QByteArray(1, Ui::GamePlayers);
     for (int I = 0; I < Joueurs.count(); I++)
@@ -70,7 +65,29 @@ void thJeu::PlayersData(QString PlayerName, QByteArray Data)
 
 }
 
+void thJeu::InitGame()
+{
+    QByteArray envoi;
+    envoi.append("0\n\n");
+    iJoueurs = QList<Joueur>();
+    for (int I = 0; I < Joueurs.count(); I++)
+    {
+        envoi.append(Joueurs[I] + "\t");
+        envoi.append(QString::number((Qt::GlobalColor)I) + "\t");
+        iJoueurs.append(Joueur(Joueurs[I], QPoint(250 + pow(-1,I) * 100, 250 + pow(-1,I) * 100), 5, (Qt::GlobalColor)I));
+        envoi.append(QString::number(iJoueurs[I].jBase.aPosition.x()) + "\r" + QString::number((iJoueurs[I].jBase.aPosition.y())) + "\r"  + QString::number(iJoueurs[I].jBase.NbrPixels) + "\t");
+        iJoueurs[I].Armees.append(Armee(iJoueurs[I].jBase.aPosition + QPoint(50,50)));
+        iJoueurs[I].Armees.append(Armee(iJoueurs[I].jBase.aPosition + QPoint(-50,50)));
+        iJoueurs[I].Armees.append(Armee(iJoueurs[I].jBase.aPosition - QPoint(50,50)));
+        iJoueurs[I].Armees.append(Armee(iJoueurs[I].jBase.aPosition + QPoint(50,-50)));
+        for (int J = 0; J < iJoueurs[I].Armees.count(); J++)
+            envoi.append(QString::number(iJoueurs[I].Armees[J].aPosition.x()) + "\r" + QString::number((iJoueurs[I].Armees[J].aPosition.y())) + "\r"  + QString::number(iJoueurs[I].Armees[J].NbrPixels) + "\t");
+        envoi.append("\n");
+    }
+
+    emit SendGameSData(envoi);
+}
 void thJeu::run()
 {
-
+    InitGame();
 }

@@ -4,6 +4,7 @@
 #include <NameSpace.h>
 #include <QTimer>
 #include <QThread>
+#include <joueur.h>
 
 class thJeu : public QThread
 {
@@ -14,11 +15,12 @@ public:
     int NoMap;
     QList<QString> Joueurs;
     QList<bool> Ready;
-    QTimer *tPlayersUpdate;
+    QList<Joueur> iJoueurs;
+    int SearchPlayer(QString);
 
 private:
-    int SearchPlayer(QString);
     void run();
+    void InitGame();
 
 signals:
     void Destroy(QThread *);
@@ -31,7 +33,7 @@ signals:
 public slots:
     void ExcludePlayer(QString);
     void CumReady(QString);
-    void tPlayersUpdate_Timeout();
+    void PlayersUpdate();
     void PlayersData(QString, QByteArray);
     void EndGame(QString);
 };

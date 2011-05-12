@@ -40,6 +40,7 @@ void MainWindow::TCPServeur_NewConnection()
         connect(this, SIGNAL(GamesRequestReply(thJoueurs *, QString)), tempthread, SLOT(GamesRequestReply(thJoueurs *, QString)));
         connect(tempthread, SIGNAL(CreateRequest(QList<QByteArray>)), this, SLOT(GameCreate(QList<QByteArray>)));
         connect(tempthread, SIGNAL(JoinRequest(thJoueurs*,QList<QByteArray>)), this, SLOT(GameJoin(thJoueurs*,QList<QByteArray>)));
+        connect(this, SIGNAL(EndGame()), tempthread, SLOT(GameEnd()));
     }
     else
         TCPServeur->nextPendingConnection()->abort();
@@ -52,6 +53,8 @@ void MainWindow::GameCreate(QList<QByteArray>Data)
         thJeu *Temp = new thJeu(Data);
         Parties.append(Temp);
         ui->lbParties->addItem(Temp->NomPartie);
+
+        connect(this, SIGNAL(PlayerAdded()), Temp, SLOT(PlayersUpdate()));
         connect(this, SIGNAL(KickGame(QString)), Temp, SLOT(EndGame(QString)));
         connect(Temp, SIGNAL(Destroy(QThread*)), this, SLOT(CloseThreads(QThread*)));
     }
@@ -60,17 +63,25 @@ void MainWindow::GameCreate(QList<QByteArray>Data)
 void MainWindow::GameJoin(thJoueurs *Joueur, QList<QByteArray> Data)
 {
     thJeu *Partie = SearchGame(Data[1]);
-    Partie->Joueurs.append(Data[0]);
-    Joueur->Nom = Data[0];
-    Partie->Ready.append(false);
 
-    connect(Partie, SIGNAL(GameBegin()), Joueur, SLOT(GameBegin()));
-    connect(Partie, SIGNAL(SendGameSData(QByteArray)), Joueur, SLOT(GameSData(QByteArray)));
-    connect(Partie, SIGNAL(PlayersUpdate(QByteArray)), Joueur, SLOT(PlayersUpdate(QByteArray)));
-    connect(Joueur, SIGNAL(GameQuit(QString)), Partie, SLOT(ExcludePlayer(QString)));
-    connect(Joueur, SIGNAL(SetReady(QString)), Partie, SLOT(CumReady(QString)));
-    connect(Joueur, SIGNAL(GameData(QString,QByteArray)), Partie, SLOT(PlayersData(QString,QByteArray)));
-    connect(Partie, SIGNAL(GameEnd()), Joueur, SLOT(GameEnd()));
+    if (Partie->SearchPlayer(Data[0]) == Partie->Joueurs.count())
+    {
+        Partie->Joueurs.append(Data[0]);
+        Joueur->Nom = Data[0];
+        Partie->Ready.append(false);
+
+        connect(Partie, SIGNAL(GameBegin()), Joueur, SLOT(GameBegin()));
+        connect(Partie, SIGNAL(SendGameSData(QByteArray)), Joueur, SLOT(GameSData(QByteArray)));
+        connect(Partie, SIGNAL(PlayersUpdate(QByteArray)), Joueur, SLOT(PlayersUpdate(QByteArray)));
+        connect(Joueur, SIGNAL(GameQuit(QString)), Partie, SLOT(ExcludePlayer(QString)));
+        connect(Joueur, SIGNAL(SetReady(QString)), Partie, SLOT(CumReady(QString)));
+        connect(Joueur, SIGNAL(GameData(QString,QByteArray)), Partie, SLOT(PlayersData(QString,QByteArray)));
+        connect(Partie, SIGNAL(GameEnd()), Joueur, SLOT(GameEnd()));
+
+        emit PlayerAdded();
+    }
+    else
+        emit EndGame();
 }
 
 void MainWindow::thJoueurs_GamesRequest(thJoueurs *Thread)
