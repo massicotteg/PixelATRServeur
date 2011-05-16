@@ -59,18 +59,21 @@ void thJoueurs::PlayersReply(thJoueurs *sender, QString Reply)
         QByteArray reply = QByteArray(1, Ui::GamePlayers);
         reply.append(Reply);
         SocketClient->write(reply);
+        SocketClient->waitForBytesWritten();
     }
 }
 
 void thJoueurs::GameBegin()
 {
     SocketClient->write(QByteArray(1, Ui::GameBegin));
+    SocketClient->waitForBytesWritten();
 }
 
 void thJoueurs::GameEnd()
 {
     GameAssigned = false;
     SocketClient->write(QByteArray(1, Ui::GameEnd));
+    SocketClient->waitForBytesWritten();
 }
 
 void thJoueurs::GameSData(QByteArray Data)
@@ -78,6 +81,7 @@ void thJoueurs::GameSData(QByteArray Data)
     QByteArray reply = QByteArray(1, Ui::GameSData);
     reply.append(Data);
     SocketClient->write(reply);
+    SocketClient->waitForBytesWritten();
 }
 
 void thJoueurs::SocketClient_Disconnected()

@@ -35,7 +35,7 @@ void thJeu::CumReady(QString Player)
         BeginReady = Ready[I];
         I++;
     }
-    if (I == Ready.count() && I > 1)
+    if (BeginReady && I > 1)
     {
         emit GameBegin();
         start();
@@ -73,8 +73,8 @@ void thJeu::InitGame()
     for (int I = 0; I < Joueurs.count(); I++)
     {
         envoi.append(Joueurs[I] + "\t");
-        envoi.append(QString::number((Qt::GlobalColor)I) + "\t");
-        iJoueurs.append(Joueur(Joueurs[I], QPoint(250 + pow(-1,I) * 100, 250 + pow(-1,I) * 100), 5, (Qt::GlobalColor)I));
+        envoi.append(QString::number((Qt::GlobalColor)(I+7)) + "\t");
+        iJoueurs.append(Joueur(Joueurs[I], QPoint(250 + pow(-1,I) * 100, 250 + pow(-1,I) * 100), 5, (Qt::GlobalColor)(I+7)));
         envoi.append(QString::number(iJoueurs[I].jBase.aPosition.x()) + "\r" + QString::number((iJoueurs[I].jBase.aPosition.y())) + "\r"  + QString::number(iJoueurs[I].jBase.NbrPixels) + "\t");
         iJoueurs[I].Armees.append(Armee(iJoueurs[I].jBase.aPosition + QPoint(50,50)));
         iJoueurs[I].Armees.append(Armee(iJoueurs[I].jBase.aPosition + QPoint(-50,50)));
@@ -90,4 +90,8 @@ void thJeu::InitGame()
 void thJeu::run()
 {
     InitGame();
+    while (true)
+    {
+
+    }
 }
