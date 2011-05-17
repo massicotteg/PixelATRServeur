@@ -14,6 +14,7 @@ public:
     QString Nom;
 
 private:
+    QByteArray ToQByteArray(int);
     QTcpSocket *SocketClient;
     bool GameAssigned;
 
@@ -34,7 +35,7 @@ public slots:
 
     void PlayersUpdate(QByteArray);
     void PlayersReply(thJoueurs *, QString);
-    void GameBegin();
+    void GameBegin(QByteArray);
     void GameEnd();
     void GameSData(QByteArray);
 };

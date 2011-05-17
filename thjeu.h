@@ -13,24 +13,23 @@ public:
     explicit thJeu(QList<QByteArray> InitData, QObject *parent = 0);
     QString NomPartie;
     int NoMap;
+    int Tick;
     QList<QString> Joueurs;
     QList<bool> Ready;
     QList<Joueur> iJoueurs;
     int SearchPlayer(QString);
-
-private:
-    void run();
-    void InitGame();
+    QTimer *tTick;
 
 signals:
     void Destroy(QThread *);
-
     void PlayersUpdate(QByteArray);
-    void GameBegin();
+    void GameBegin(QByteArray);
     void GameEnd();
     void SendGameSData(QByteArray);
 
 public slots:
+    void InitGame();
+    void TickTimeOut();
     void ExcludePlayer(QString);
     void CumReady(QString);
     void PlayersUpdate();

@@ -7,6 +7,9 @@ thJeu::thJeu(QList<QByteArray> InitData, QObject *parent) :
     InitData[1].number(NoMap);
     Joueurs = QList<QString>();
     Ready = QList<bool>();
+    tTick = new QTimer();
+
+    connect(tTick, SIGNAL(timeout()), this, SLOT(TickTimeOut()));
 }
 
 int thJeu::SearchPlayer(QString Player)
@@ -35,11 +38,8 @@ void thJeu::CumReady(QString Player)
         BeginReady = Ready[I];
         I++;
     }
-    if (BeginReady && I > 1)
-    {
-        emit GameBegin();
-        start();
-    }
+    if (BeginReady && I > 0)
+        InitGame();
     PlayersUpdate();
 }
 
@@ -58,11 +58,6 @@ void thJeu::EndGame(QString Partie)
         emit GameEnd();
         emit Destroy(this);
     }
-}
-
-void thJeu::PlayersData(QString PlayerName, QByteArray Data)
-{
-
 }
 
 void thJeu::InitGame()
@@ -85,13 +80,59 @@ void thJeu::InitGame()
         envoi.append("\n");
     }
 
-    emit SendGameSData(envoi);
+    emit GameBegin(envoi);
+    tTick->start(100);
 }
-void thJeu::run()
-{
-    InitGame();
-    while (true)
-    {
 
+void thJeu::PlayersData(QString PlayerName, QByteArray Data)
+{
+    QList<QByteArray> TrameData;
+    QList<QByteArray> ListePoints;
+    int I = 0;
+    while (I < iJoueurs.count() && PlayerName != iJoueurs[I].Nom)
+        I++;
+
+    if (I != iJoueurs.count())
+    {
+        TrameData = Data.split('\n');
+
+        if (TrameData.count() > 2)
+        {
+            ListePoints = TrameData[2].split('\t');
+            ListePoints.removeLast();
+            if (TrameData[1].toInt() == 0)
+            {
+                iJoueurs[I].jBase.Commandes.clear();
+                for (int J = 0; J < ListePoints.count(); J+=2)
+                    iJoueurs[I].jBase.Commandes.append(QPoint(ListePoints[J].toInt(), ListePoints[J+1].toInt()));
+            }
+            else
+            {
+                iJoueurs[I].Armees[TrameData[1].toInt()-1].Commandes.clear();
+                for (int J = 0; J < ListePoints.count(); J+=2)
+                    iJoueurs[I].Armees[TrameData[1].toInt()-1].Commandes.append(QPoint(ListePoints[J].toInt(), ListePoints[J+1].toInt()));
+            }
+        }
     }
+}
+
+void thJeu::TickTimeOut()
+{
+    QByteArray envoi;
+    envoi.append("1");
+
+    for (int I = 0; I < iJoueurs.count(); I++)
+    {
+        iJoueurs[I].jBase.Move();
+        envoi.append(QString::number(iJoueurs[I].jBase.aPosition.x()) + "\r" + QString::number((iJoueurs[I].jBase.aPosition.y())) + "\r"  + QString::number(iJoueurs[I].jBase.NbrPixels) + "\t");
+
+        for (int J = 0; J < iJoueurs[I].Armees.count(); J++)
+        {
+            iJoueurs[I].Armees[J].Move();
+            envoi.append(QString::number(iJoueurs[I].Armees[J].aPosition.x()) + "\r" + QString::number((iJoueurs[I].Armees[J].aPosition.y())) + "\r"  + QString::number(iJoueurs[I].Armees[J].NbrPixels) + "\t");
+        }
+        envoi.append('\n');
+    }
+
+    emit SendGameSData(envoi);
 }

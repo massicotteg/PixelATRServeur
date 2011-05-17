@@ -9,8 +9,10 @@ public:
     Armee();
     Armee(QPoint);
     QPoint aPosition;
+    QPointF pPosition;
     QList<QPoint> Commandes;
     int NbrPixels;
+    void Move();
 };
 
 class Base: public Armee

@@ -70,7 +70,7 @@ void MainWindow::GameJoin(thJoueurs *Joueur, QList<QByteArray> Data)
         Joueur->Nom = Data[0];
         Partie->Ready.append(false);
 
-        connect(Partie, SIGNAL(GameBegin()), Joueur, SLOT(GameBegin()));
+        connect(Partie, SIGNAL(GameBegin(QByteArray)), Joueur, SLOT(GameBegin(QByteArray)));
         connect(Partie, SIGNAL(SendGameSData(QByteArray)), Joueur, SLOT(GameSData(QByteArray)));
         connect(Partie, SIGNAL(PlayersUpdate(QByteArray)), Joueur, SLOT(PlayersUpdate(QByteArray)));
         connect(Joueur, SIGNAL(GameQuit(QString)), Partie, SLOT(ExcludePlayer(QString)));
