@@ -15,30 +15,45 @@ thJoueurs::~thJoueurs()
         emit GameQuit(Nom);
 }
 
+int thJoueurs::ToInt(QByteArray Data)
+{
+    int d[4];
+    int Res = 0;
+    d[0] = (((int)((uchar)Data[0])) << 24);
+    d[1] = (((int)((uchar)Data[1])) << 16);
+    d[2] = (((int)((uchar)Data[2])) << 8);
+    d[3] = ((int)((uchar)Data[3]));
+    for (int I = 0; I < 4; I++)
+        Res += d[I];
+    return Res;
+}
 void thJoueurs::SocketClient_ReadyRead()
 {
-    QByteArray Data = SocketClient->readAll();
-    switch (Data[0])
+    while (SocketClient->bytesAvailable())
     {
-        case Ui::GameCData:
-            emit GameData(Nom, Data.remove(0, 1));
-            break;
-        case Ui::GamesRequest:
-            emit GamesRequest(this);
-            break;
-        case Ui::GameSetReady:
-            emit SetReady(Nom);
-            break;
-        case Ui::GameJoin:
-            if (!GameAssigned)
-                emit JoinRequest(this, Data.remove(0,1).split('\n'));
-            break;
-        case Ui::GameCreate:
-            emit CreateRequest(Data.remove(0,1).split('\n'));
-            break;
-        case Ui::GameQuit:
-            emit GameQuit(Nom);
-            break;
+        QByteArray Data = SocketClient->read(ToInt(SocketClient->read(4)));
+        switch (Data[0])
+        {
+            case Ui::GameCData:
+                emit GameData(Nom, Data.remove(0, 1));
+                break;
+            case Ui::GamesRequest:
+                emit GamesRequest(this);
+                break;
+            case Ui::GameSetReady:
+                emit SetReady(Nom);
+                break;
+            case Ui::GameJoin:
+                if (!GameAssigned)
+                    emit JoinRequest(this, Data.remove(0,1).split('\n'));
+                break;
+            case Ui::GameCreate:
+                emit CreateRequest(Data.remove(0,1).split('\n'));
+                break;
+            case Ui::GameQuit:
+                emit GameQuit(Nom);
+                break;
+        }
     }
 }
 
@@ -59,6 +74,7 @@ void thJoueurs::GamesRequestReply(thJoueurs *sender, QString Reply)
 
         reply.insert(0, ToQByteArray(reply.count()));
         SocketClient->write(reply);
+        SocketClient->waitForBytesWritten();
     }
 }
 

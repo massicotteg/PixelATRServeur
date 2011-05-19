@@ -15,6 +15,7 @@ public:
 
 private:
     QByteArray ToQByteArray(int);
+    int ToInt(QByteArray);
     QTcpSocket *SocketClient;
     bool GameAssigned;
 

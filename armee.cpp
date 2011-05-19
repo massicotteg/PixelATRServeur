@@ -18,14 +18,13 @@ void Armee::Move()
         float varx, vary, distance;
         distance = sqrt(pow(Commandes[0].x() - pPosition.x(),2) + pow(Commandes[0].y() - pPosition.y(),2));
 
-        varx = (Commandes[0].x() - pPosition.x()) / distance * 5;
-        vary = (Commandes[0].y() - pPosition.y()) / distance * 5;
+        varx = (Commandes[0].x() - pPosition.x()) * 5 / distance;
+        vary = (Commandes[0].y() - pPosition.y()) * 5 / distance;
         pPosition.setX(pPosition.x() + varx);
         pPosition.setY(pPosition.y() + vary);
         aPosition = pPosition.toPoint();
 
-        distance = sqrt(pow(Commandes[0].x() - pPosition.x(),2) + pow(Commandes[0].y() - pPosition.y(),2));
-        if (distance < 5)
+        if (distance < 15)
             Commandes.removeAt(0);
     }
 }
