@@ -7,6 +7,7 @@
 class Joueur
 {
 public:
+    Joueur();
     explicit Joueur(QString, QPoint, int, QColor);
     QString Nom;
     Base jBase;

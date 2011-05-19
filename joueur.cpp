@@ -1,5 +1,6 @@
 #include "joueur.h"
 
+Joueur::Joueur(){}
 Joueur::Joueur(QString NomJoueur, QPoint Position, int SpawnRate, QColor  CouleurJoueur)
 {
     Nom = NomJoueur;

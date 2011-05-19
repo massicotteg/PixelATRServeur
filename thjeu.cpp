@@ -69,7 +69,7 @@ void thJeu::InitGame()
     {
         envoi.append(Joueurs[I] + "\t");
         envoi.append(QString::number((Qt::GlobalColor)(I+7)) + "\t");
-        iJoueurs.append(Joueur(Joueurs[I], QPoint(250 + pow(-1,I) * 100, 250 + pow(-1,I) * 100), 5, (Qt::GlobalColor)(I+7)));
+        iJoueurs.append(Joueur(Joueurs[I], QPoint(250 + pow(-1,I) * 100, 250 + pow(-1,I) * 100), 2, (Qt::GlobalColor)(I+7)));
         envoi.append(QString::number(iJoueurs[I].jBase.aPosition.x()) + "\r" + QString::number((iJoueurs[I].jBase.aPosition.y())) + "\r"  + QString::number(iJoueurs[I].jBase.NbrPixels) + "\t");
         iJoueurs[I].Armees.append(Armee(iJoueurs[I].jBase.aPosition + QPoint(50,50)));
         iJoueurs[I].Armees.append(Armee(iJoueurs[I].jBase.aPosition + QPoint(-50,50)));

@@ -15,13 +15,15 @@ SOURCES += main.cpp\
     thjoueurs.cpp \
     thjeu.cpp \
     joueur.cpp \
-    armee.cpp
+    armee.cpp \
+    bataille.cpp
 
 HEADERS  += mainwindow.h \
     NameSpace.h \
     thjoueurs.h \
     thjeu.h \
     joueur.h \
-    armee.h
+    armee.h \
+    bataille.h
 
 FORMS    += mainwindow.ui
