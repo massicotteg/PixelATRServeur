@@ -125,7 +125,12 @@ void thJeu::TickTimeOut()
     {
         iJoueurs[I].jBase.Move();
         envoi.append(QString::number(iJoueurs[I].jBase.aPosition.x()) + "\r" + QString::number((iJoueurs[I].jBase.aPosition.y())) + "\r"  + QString::number(iJoueurs[I].jBase.NbrPixels) + "\t");
-
+        iJoueurs[I].jBase.NbrPixels += iJoueurs[I].jBase.ProductRate;
+        if (iJoueurs[I].jBase.NbrPixels > 150)
+        {
+            iJoueurs[I].Armees.append(Armee(iJoueurs[I].jBase.aPosition));
+            iJoueurs[I].jBase.NbrPixels = 50;
+        }
 
         for (int J = 0; J < iJoueurs[I].Armees.count(); J++)
         {
