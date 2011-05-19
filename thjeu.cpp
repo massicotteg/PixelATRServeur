@@ -126,9 +126,17 @@ void thJeu::TickTimeOut()
         iJoueurs[I].jBase.Move();
         envoi.append(QString::number(iJoueurs[I].jBase.aPosition.x()) + "\r" + QString::number((iJoueurs[I].jBase.aPosition.y())) + "\r"  + QString::number(iJoueurs[I].jBase.NbrPixels) + "\t");
 
+
         for (int J = 0; J < iJoueurs[I].Armees.count(); J++)
         {
             iJoueurs[I].Armees[J].Move();
+
+            for (int K = 0; K < iJoueurs.count(); K++)
+                if (K!=I)
+                    for (int L = 0; L < iJoueurs[K].Armees.count(); L++)
+                        if (sqrt(pow(iJoueurs[I].Armees[J].pPosition.y() - iJoueurs[K].Armees[L].pPosition.y(), 2) + pow(iJoueurs[I].Armees[J].pPosition.x() - iJoueurs[K].Armees[L].pPosition.x(), 2)) <= ((-20 * pow(2, -iJoueurs[I].Armees[J].NbrPixels/250.0) + 35) + (-20 * pow(2, -iJoueurs[K].Armees[L].NbrPixels/250.0) + 35)))
+                            iJoueurs[I].Armees[J].Commandes.clear();
+
             envoi.append(QString::number(iJoueurs[I].Armees[J].aPosition.x()) + "\r" + QString::number((iJoueurs[I].Armees[J].aPosition.y())) + "\r"  + QString::number(iJoueurs[I].Armees[J].NbrPixels) + "\t");
         }
         envoi.append('\n');
