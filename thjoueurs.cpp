@@ -1,7 +1,6 @@
 #include <thjoueurs.h>
 
-thJoueurs::thJoueurs(QObject *parent, QTcpSocket *socketClient) :
-    QThread(parent)
+thJoueurs::thJoueurs(QTcpSocket *socketClient)
 {
     SocketClient = socketClient;
     connect(SocketClient, SIGNAL(readyRead()), this, SLOT(SocketClient_ReadyRead()));
@@ -106,12 +105,21 @@ void thJoueurs::GameBegin(QByteArray Initialisation)
     SocketClient->waitForBytesWritten();
 }
 
-void thJoueurs::GameEnd()
+void thJoueurs::GameEnd(QByteArray Donnees, QString NomPartie)
 {
-    QByteArray reply = QByteArray(1, Ui::GameEnd);
+    QByteArray reply1 = QByteArray(1, Ui::GameSData);
+    reply1.append(Donnees);
+    reply1.insert(0, ToQByteArray(reply1.count()));
+
+    QByteArray reply2 = QByteArray(1, Ui::GameEnd);
+    reply2.insert(0, ToQByteArray(reply2.count()));
+
+    QByteArray reply;
+    if (Donnees != 0)
+        reply.append(reply1);
+    reply.append(reply2);
     GameAssigned = false;
 
-    reply.insert(0, ToQByteArray(reply.count()));
     SocketClient->write(reply);
     SocketClient->waitForBytesWritten();
 }

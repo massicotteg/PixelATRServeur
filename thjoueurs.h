@@ -5,11 +5,11 @@
 #include <QThread>
 #include <QtNetwork>
 
-class thJoueurs : public QThread
+class thJoueurs : public QObject
 {
     Q_OBJECT
 public:
-    explicit thJoueurs(QObject *parent = 0, QTcpSocket *socketClient=0);
+    explicit thJoueurs(QTcpSocket *socketClient=0);
     ~thJoueurs();
     QString Nom;
 
@@ -20,7 +20,7 @@ private:
     bool GameAssigned;
 
 signals:
-    void Disconnected(QThread *);
+    void Disconnected(QObject *);
 
     void GamesRequest(thJoueurs *);
     void CreateRequest(QList<QByteArray>);
@@ -37,7 +37,7 @@ public slots:
     void PlayersUpdate(QByteArray);
     void PlayersReply(thJoueurs *, QString);
     void GameBegin(QByteArray);
-    void GameEnd();
+    void GameEnd(QByteArray, QString);
     void GameSData(QByteArray);
 };
 

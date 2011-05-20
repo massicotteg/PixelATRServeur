@@ -14,7 +14,7 @@ Armee::Armee(QPoint StartPosition)
 
 void Armee::Move()
 {
-    float varx, vary, distance, DepDist = 5;
+    float varx, vary, distance, DepDist = 7.5;
 
     while (Commandes.count() > 0 && DepDist > 0)
     {

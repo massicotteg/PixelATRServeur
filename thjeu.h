@@ -3,14 +3,13 @@
 
 #include <NameSpace.h>
 #include <QTimer>
-#include <QThread>
 #include <bataille.h>
 
-class thJeu : public QThread
+class thJeu: public QObject
 {
     Q_OBJECT
 public:
-    explicit thJeu(QList<QByteArray> InitData, QObject *parent = 0);
+    explicit thJeu(QList<QByteArray> InitData);
     QString NomPartie;
     int NoMap;
     int Tick;
@@ -24,10 +23,10 @@ private:
     QList<Bataille> ListeBataille;
 
 signals:
-    void Destroy(QThread *);
+    void Destroy(QObject *);
     void PlayersUpdate(QByteArray);
     void GameBegin(QByteArray);
-    void GameEnd();
+    void GameEnd(QByteArray, QString);
     void SendGameSData(QByteArray);
 
 public slots:
@@ -37,7 +36,7 @@ public slots:
     void CumReady(QString);
     void PlayersUpdate();
     void PlayersData(QString, QByteArray);
-    void EndGame(QString);
+    void EndGame(QByteArray, QString);
 };
 
 #endif // THJEU_H

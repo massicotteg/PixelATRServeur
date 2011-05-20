@@ -1,7 +1,6 @@
 #include "thjeu.h"
 
-thJeu::thJeu(QList<QByteArray> InitData, QObject *parent) :
-    QThread(parent)
+thJeu::thJeu(QList<QByteArray> InitData)
 {
     NomPartie = InitData[0];
     InitData[1].number(NoMap);
@@ -25,6 +24,19 @@ void thJeu::ExcludePlayer(QString Player)
     int I = SearchPlayer(Player);
     Joueurs.removeAt(I);
     Ready.removeAt(I);
+
+    if (tTick->isActive())
+    {
+        int I = 0;
+        while (I < iJoueurs.count() && iJoueurs[I]->Nom != Player)
+               I++;
+        if (I < iJoueurs.count())
+        {
+            iJoueurs[I]->Armees.clear();
+            iJoueurs[I]->jBase->ProductRate = 0;
+            iJoueurs[I]->jBase->NbrPixels = 0;
+        }
+    }
 }
 
 void thJeu::CumReady(QString Player)
@@ -51,14 +63,16 @@ void thJeu::PlayersUpdate()
     emit PlayersUpdate(PlayersList);
 }
 
-void thJeu::EndGame(QString Partie)
+void thJeu::EndGame(QByteArray Donnees, QString Partie)
 {
-    if (NomPartie == Partie)
+    if (NomPartie == Partie || NomPartie + " Terminé" == Partie)
     {
-        emit GameEnd();
+        emit GameEnd(Donnees, NomPartie);
         for (int I = 0; I < iJoueurs.count(); I++)
+        {
             delete iJoueurs[I];
-        delete tTick;
+            iJoueurs.removeAt(I);
+        }
         emit Destroy(this);
     }
 }
@@ -68,11 +82,22 @@ void thJeu::InitGame()
     QByteArray envoi;
     envoi.append("0\n\n");
     iJoueurs = QList<Joueur *>();
-    for (int I = 0; I < Joueurs.count(); I++)
+
+    qDebug("InitPlayers");
+    iJoueurs.append(new Joueur(Joueurs[0], QPoint(250 + pow(-1,0) * 100, 250 + pow(-1,0) * 100), 2, (Qt::GlobalColor)(7)));
+    iJoueurs.append(new Joueur(Joueurs[1], QPoint(250 + pow(-1,1) * 100, 250 + pow(-1,1) * 100), 2, (Qt::GlobalColor)(8)));
+    if (Joueurs.count() >= 3)
+    {
+        iJoueurs.append(new Joueur(Joueurs[2], QPoint(250 + pow(-1,0) * 100, 250 + pow(-1,1) * 100), 2, (Qt::GlobalColor)(9)));
+        if (Joueurs.count() >= 4)
+            iJoueurs.append(new Joueur(Joueurs[3], QPoint(250 + pow(-1,1) * 100, 250 + pow(-1,0) * 100), 2, (Qt::GlobalColor)(10)));
+    }
+
+    qDebug("InitArmees");
+    for (int I = 0; I < iJoueurs.count(); I++)
     {
         envoi.append(Joueurs[I] + "\t");
         envoi.append(QString::number((Qt::GlobalColor)(I+7)) + "\t");
-        iJoueurs.append(new Joueur(Joueurs[I], QPoint(250 + pow(-1,I) * 100, 250 + pow(-1,I) * 100), 2, (Qt::GlobalColor)(I+7)));
         envoi.append(QString::number(iJoueurs[I]->jBase->aPosition.x()) + "\r" + QString::number((iJoueurs[I]->jBase->aPosition.y())) + "\r"  + QString::number(iJoueurs[I]->jBase->NbrPixels) + "\t");
         iJoueurs[I]->Armees.append(new Armee(iJoueurs[I]->jBase->aPosition + QPoint(50,50)));
         iJoueurs[I]->Armees.append(new Armee(iJoueurs[I]->jBase->aPosition + QPoint(-50,50)));
@@ -121,6 +146,7 @@ void thJeu::PlayersData(QString PlayerName, QByteArray Data)
 
 void thJeu::TickTimeOut()
 {
+    qDebug("TickTimeOut");
     QByteArray envoi;
     envoi.append("1");
 
@@ -156,10 +182,14 @@ void thJeu::TickTimeOut()
                                             {
                                                 iJoueurs.at(K)->Armees.at(L)->Commandes.clear();
                                                 iJoueurs.at(K)->Armees.at(L)->BatailleEngagee = ListeBataille.count();
+                                                qDebug("Bataille");
                                                 ListeBataille.append(Bataille(iJoueurs.at(I), iJoueurs.at(I)->Armees.at(J), iJoueurs.at(K), iJoueurs.at(K)->Armees.at(L)));
                                             }
                                             else
+                                            {
+                                                qDebug("Ajout De Participant");
                                                 ListeBataille[iJoueurs.at(K)->Armees.at(L)->BatailleEngagee].AjouterParticipant(iJoueurs.at(I), iJoueurs.at(I)->Armees.at(J));
+                                            }
                                             iJoueurs.at(I)->Armees.at(J)->BatailleEngagee = iJoueurs.at(K)->Armees.at(L)->BatailleEngagee;
                                         }
                                 }
@@ -168,6 +198,7 @@ void thJeu::TickTimeOut()
                                     {
                                         if (iJoueurs.at(K)->Armees.at(L)->BatailleEngagee == -1)
                                         {
+                                            qDebug("Combinaison de deux armees");
                                             iJoueurs.at(I)->Armees.at(J)->NbrPixels += iJoueurs.at(K)->Armees.at(L)->NbrPixels;
                                             if (iJoueurs.at(K)->Armees.at(L)->Commandes.count() == 0)
                                                 iJoueurs.at(I)->Armees.at(J)->Commandes = iJoueurs.at(K)->Armees.at(L)->Commandes;
@@ -186,7 +217,7 @@ void thJeu::TickTimeOut()
                 if (iJoueurs.at(I)->Armees[J]->BatailleEngagee == -1)
                 {
                     delete iJoueurs.at(I)->Armees[J];
-                    iJoueurs.at(I)->Armees.removeAt(J);
+                    iJoueurs.at(I)->Armees.removeAt(J--);
                 }
             }
 
@@ -214,5 +245,15 @@ void thJeu::TickTimeOut()
         envoi.append('\n');
     }
 
-    emit SendGameSData(envoi);
+    for (int I = 0; I < iJoueurs.count(); I++)
+        if (iJoueurs[I]->Armees.count() == 0)
+        {
+            iJoueurs[I]->jBase->ProductRate = 0;
+            iJoueurs[I]->jBase->NbrPixels = 0;
+            ExcludePlayer(iJoueurs[I]->Nom);
+        }
+    if (Joueurs.count() <= 1)
+        GameEnd(envoi, NomPartie);
+    else
+        emit SendGameSData(envoi);
 }

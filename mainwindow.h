@@ -28,13 +28,13 @@ private:
 
 signals:
     void GamesRequestReply(thJoueurs *, QString);
-    void KickGame(QString);
+    void KickGame(QByteArray, QString);
     void PlayerAdded();
-    void EndGame();
+    void EndGame(QByteArray, QString);
 
 private slots:
     void TCPServeur_NewConnection();
-    void CloseThreads(QThread *Thread);
+    void CloseThreads(QObject *objet);
 
     void thJoueurs_GamesRequest(thJoueurs *);
     void GameCreate(QList<QByteArray>);
@@ -42,6 +42,7 @@ private slots:
     void on_btnAppliquer_clicked();
     void on_btnDemarrer_clicked();
     void on_btnDemarrerArreter_clicked();
+    void DelGame(QByteArray, QString);
     void on_btnKick_clicked();
     void on_lbParties_currentRowChanged(int currentRow);
 };
