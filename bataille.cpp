@@ -15,6 +15,10 @@ Bataille::Bataille(Joueur *Joueur1, Armee *ArmeeJoueur1, Joueur *Joueur2, Armee 
     ListeParticipants = QList<Participant>();
     ListeParticipants.append(Participant(Joueur1, ArmeeJoueur1));
     ListeParticipants.append(Participant(Joueur2, ArmeeJoueur2));
+
+    double dif = ListeParticipants[0].ListeArmees[0]->NbrPixels - ListeParticipants[1].ListeArmees[0]->NbrPixels / 1000.0;
+    ListeParticipants[0].Efficacite += dif;
+    ListeParticipants[1].Efficacite -= dif;
 }
 
 void Bataille::AjouterParticipant(Joueur *joueur, Armee *armee)
@@ -40,11 +44,12 @@ void Bataille::Tick(QList<Joueur *> Joueurs)
 {
     for (int I = 0; I < ListeParticipants.count(); I++)
         for (int J = 0; J < ListeParticipants[I].ListeArmees.count(); J++)
-            if (ListeParticipants[I].ListeArmees[J]->NbrPixels - 2 / ListeParticipants[I].Efficacite > 0)
-                ListeParticipants[I].ListeArmees[J]->NbrPixels -= 2 / ListeParticipants[I].Efficacite;
+            if (ListeParticipants[I].ListeArmees[J]->NbrPixels - 5 / ListeParticipants[I].Efficacite > 0)
+                ListeParticipants[I].ListeArmees[J]->NbrPixels -= 5 / ListeParticipants[I].Efficacite;
             else
             {
                 Joueurs[Joueurs.indexOf(ListeParticipants[I].Proprietaire)]->Armees.removeOne(ListeParticipants[I].ListeArmees[J]);
+                delete ListeParticipants[I].ListeArmees[J];
                 ListeParticipants[I].ListeArmees.removeAt(J--);
             }
 

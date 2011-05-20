@@ -38,7 +38,7 @@ void thJeu::CumReady(QString Player)
         BeginReady = Ready[I];
         I++;
     }
-    if (BeginReady && I > 0)
+    if (BeginReady && I > 1)
         InitGame();
     PlayersUpdate();
 }
@@ -56,6 +56,9 @@ void thJeu::EndGame(QString Partie)
     if (NomPartie == Partie)
     {
         emit GameEnd();
+        for (int I = 0; I < iJoueurs.count(); I++)
+            delete iJoueurs[I];
+        delete tTick;
         emit Destroy(this);
     }
 }
@@ -136,35 +139,64 @@ void thJeu::TickTimeOut()
             iJoueurs[I]->Armees[J]->Move();
 
             for (int K = 0; K < iJoueurs.count(); K++)
-                if (K!=I)
-                    for (int L = 0; L < iJoueurs[K]->Armees.count(); L++)
-                        if (sqrt(pow(iJoueurs.at(I)->Armees.at(J)->pPosition.y() - iJoueurs.at(K)->Armees.at(L)->pPosition.y(), 2) + pow(iJoueurs.at(I)->Armees.at(J)->pPosition.x() - iJoueurs.at(K)->Armees.at(L)->pPosition.x(), 2)) <= ((-20 * pow(2, -iJoueurs.at(I)->Armees.at(J)->NbrPixels/250.0) + 35) + (-20 * pow(2, -iJoueurs.at(K)->Armees.at(L)->NbrPixels/250.0) + 35)))
+                for (int L = 0; L < iJoueurs[K]->Armees.count(); L++)
+                    if (iJoueurs.at(K)->Armees.at(L)->NbrPixels != 0)
+                        if (!(K == I && J == L))
                         {
-                            if (iJoueurs.at(I)->Armees.at(J)->BatailleEngagee == -1)
+                            double distancePoints = sqrt(pow(iJoueurs.at(I)->Armees.at(J)->pPosition.y() - iJoueurs.at(K)->Armees.at(L)->pPosition.y(), 2) + pow(iJoueurs.at(I)->Armees.at(J)->pPosition.x() - iJoueurs.at(K)->Armees.at(L)->pPosition.x(), 2));
+                            if (distancePoints <= ((-20 * pow(2, -iJoueurs.at(I)->Armees.at(J)->NbrPixels/250.0) + 35) + (-20 * pow(2, -iJoueurs.at(K)->Armees.at(L)->NbrPixels/250.0) + 35)))
                             {
-                                iJoueurs.at(I)->Armees.at(J)->Commandes.clear();
-
-                                if (iJoueurs.at(K)->Armees.at(L)->BatailleEngagee == -1)
+                                if (K!=I)
                                 {
-                                    iJoueurs.at(K)->Armees.at(L)->Commandes.clear();
-                                    iJoueurs.at(K)->Armees.at(L)->BatailleEngagee = ListeBataille.count();
-                                    ListeBataille.append(Bataille(iJoueurs.at(I), iJoueurs.at(I)->Armees.at(J), iJoueurs.at(K), iJoueurs.at(K)->Armees.at(L)));
+                                        if (iJoueurs.at(I)->Armees.at(J)->BatailleEngagee == -1)
+                                        {
+                                            iJoueurs.at(I)->Armees.at(J)->Commandes.clear();
+
+                                            if (iJoueurs.at(K)->Armees.at(L)->BatailleEngagee == -1)
+                                            {
+                                                iJoueurs.at(K)->Armees.at(L)->Commandes.clear();
+                                                iJoueurs.at(K)->Armees.at(L)->BatailleEngagee = ListeBataille.count();
+                                                ListeBataille.append(Bataille(iJoueurs.at(I), iJoueurs.at(I)->Armees.at(J), iJoueurs.at(K), iJoueurs.at(K)->Armees.at(L)));
+                                            }
+                                            else
+                                                ListeBataille[iJoueurs.at(K)->Armees.at(L)->BatailleEngagee].AjouterParticipant(iJoueurs.at(I), iJoueurs.at(I)->Armees.at(J));
+                                            iJoueurs.at(I)->Armees.at(J)->BatailleEngagee = iJoueurs.at(K)->Armees.at(L)->BatailleEngagee;
+                                        }
                                 }
                                 else
-                                    ListeBataille[iJoueurs.at(K)->Armees.at(L)->BatailleEngagee].AjouterParticipant(iJoueurs.at(I), iJoueurs.at(I)->Armees.at(J));
-                                iJoueurs.at(I)->Armees.at(J)->BatailleEngagee = iJoueurs.at(K)->Armees.at(L)->BatailleEngagee;
+                                    if (iJoueurs.at(I)->Armees.at(J)->NbrPixels + iJoueurs.at(K)->Armees.at(L)->NbrPixels < 1000 && distancePoints <= ((-15 * pow(2, -iJoueurs.at(I)->Armees.at(J)->NbrPixels/250.0) + 15) + (-15 * pow(2, -iJoueurs.at(K)->Armees.at(L)->NbrPixels/250.0) + 15)))
+                                    {
+                                        if (iJoueurs.at(K)->Armees.at(L)->BatailleEngagee == -1)
+                                        {
+                                            iJoueurs.at(I)->Armees.at(J)->NbrPixels += iJoueurs.at(K)->Armees.at(L)->NbrPixels;
+                                            if (iJoueurs.at(K)->Armees.at(L)->Commandes.count() == 0)
+                                                iJoueurs.at(I)->Armees.at(J)->Commandes = iJoueurs.at(K)->Armees.at(L)->Commandes;
+                                            iJoueurs.at(K)->Armees.at(L)->NbrPixels = 0;
+                                        }
+                                    }
                             }
                         }
         }
     }
+
+    for (int I = 0; I < iJoueurs.count(); I++)
+        for (int J = 0; J < iJoueurs[I]->Armees.count(); J++)
+            if (iJoueurs.at(I)->Armees.at(J)->NbrPixels == 0)
+            {
+                if (iJoueurs.at(I)->Armees[J]->BatailleEngagee == -1)
+                {
+                    delete iJoueurs.at(I)->Armees[J];
+                    iJoueurs.at(I)->Armees.removeAt(J);
+                }
+            }
 
     for (int I = 0; I < ListeBataille.count(); I++)
     {
         ListeBataille[I].Tick(iJoueurs);
         if (ListeBataille[I].ListeParticipants.count() <= 1)
         {
-            ListeBataille.removeAt(I--);
-            for (int J = I + 1; J < ListeBataille.count(); J++)
+            ListeBataille.removeAt(I);
+            for (int J = I--; J < ListeBataille.count(); J++)
                 for (int K = 0; K < ListeBataille[J].ListeParticipants.count(); K++)
                     for (int L = 0; L < ListeBataille[J].ListeParticipants[K].ListeArmees.count(); L++)
                         ListeBataille[J].ListeParticipants[K].ListeArmees[L]->BatailleEngagee--;

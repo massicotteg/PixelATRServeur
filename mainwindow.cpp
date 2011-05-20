@@ -120,7 +120,6 @@ void MainWindow::on_btnKick_clicked()
 {
     emit KickGame(ui->lbParties->item(ui->lbParties->currentRow())->text());
     Parties.removeAt(ui->lbParties->currentRow());
-    GamesRequestReply(0, ui->lbParties->item(ui->lbParties->currentRow())->text());
     delete ui->lbParties->currentItem();
 }
 
