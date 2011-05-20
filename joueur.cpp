@@ -4,7 +4,7 @@ Joueur::Joueur(){}
 Joueur::Joueur(QString NomJoueur, QPoint Position, int SpawnRate, QColor  CouleurJoueur)
 {
     Nom = NomJoueur;
-    jBase = Base(Position, SpawnRate);
+    jBase = new Base(Position, SpawnRate);
     Couleur = CouleurJoueur;
-    Armees = QList<Armee>();
+    Armees = QList<Armee *>();
 }

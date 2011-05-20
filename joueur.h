@@ -10,8 +10,8 @@ public:
     Joueur();
     explicit Joueur(QString, QPoint, int, QColor);
     QString Nom;
-    Base jBase;
-    QList<Armee> Armees;
+    Base *jBase;
+    QList<Armee *> Armees;
     QColor Couleur;
 };
 

@@ -12,6 +12,7 @@ public:
     QPointF pPosition;
     QList<QPoint> Commandes;
     int NbrPixels;
+    int BatailleEngagee;
     void Move();
 };
 

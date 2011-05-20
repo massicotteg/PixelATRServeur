@@ -4,7 +4,7 @@
 #include <NameSpace.h>
 #include <QTimer>
 #include <QThread>
-#include <joueur.h>
+#include <bataille.h>
 
 class thJeu : public QThread
 {
@@ -16,9 +16,12 @@ public:
     int Tick;
     QList<QString> Joueurs;
     QList<bool> Ready;
-    QList<Joueur> iJoueurs;
+    QList<Joueur *> iJoueurs;
     int SearchPlayer(QString);
     QTimer *tTick;
+
+private:
+    QList<Bataille> ListeBataille;
 
 signals:
     void Destroy(QThread *);
