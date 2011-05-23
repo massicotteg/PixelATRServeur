@@ -2,55 +2,55 @@
 
 thJoueurs::thJoueurs(QTcpSocket *socketClient)
 {
-    SocketClient = socketClient;
-    connect(SocketClient, SIGNAL(readyRead()), this, SLOT(SocketClient_ReadyRead()));
-    connect(SocketClient, SIGNAL(disconnected()), this, SLOT(SocketClient_Disconnected()));
+    m_SocketClient = socketClient;
+    connect(m_SocketClient, SIGNAL(readyRead()), this, SLOT(m_SocketClient_ReadyRead()));
+    connect(m_SocketClient, SIGNAL(disconnected()), this, SLOT(m_SocketClient_Disconnected()));
 
-    GameAssigned = false;
+    m_PartieAssignee = false;
 }
 thJoueurs::~thJoueurs()
 {
-    if (Nom != "")
-        emit GameQuit(Nom);
+    if (m_Nom != "")
+        emit QuitterPartie(m_Nom);
 }
 
-int thJoueurs::ToInt(QByteArray Data)
+int thJoueurs::ToInt(QByteArray Donnees)
 {
     int d[4];
     int Res = 0;
-    d[0] = (((int)((uchar)Data[0])) << 24);
-    d[1] = (((int)((uchar)Data[1])) << 16);
-    d[2] = (((int)((uchar)Data[2])) << 8);
-    d[3] = ((int)((uchar)Data[3]));
+    d[0] = (((int)((uchar)Donnees[0])) << 24);
+    d[1] = (((int)((uchar)Donnees[1])) << 16);
+    d[2] = (((int)((uchar)Donnees[2])) << 8);
+    d[3] = ((int)((uchar)Donnees[3]));
     for (int I = 0; I < 4; I++)
         Res += d[I];
     return Res;
 }
-void thJoueurs::SocketClient_ReadyRead()
+void thJoueurs::m_SocketClient_ReadyRead()
 {
-    while (SocketClient->bytesAvailable())
+    while (m_SocketClient->bytesAvailable())
     {
-        QByteArray Data = SocketClient->read(ToInt(SocketClient->read(4)));
-        switch (Data[0])
+        QByteArray Donnees = m_SocketClient->read(ToInt(m_SocketClient->read(4)));
+        switch (Donnees[0])
         {
-            case Ui::GameCData:
-                emit GameData(Nom, Data.remove(0, 1));
+            case Ui::DonneesClient:
+                emit DonneesPartie(m_Nom, Donnees.remove(0, 1));
                 break;
-            case Ui::GamesRequest:
-                emit GamesRequest(this);
+            case Ui::DemandeParties:
+                emit DemandeParties(this);
                 break;
-            case Ui::GameSetReady:
-                emit SetReady(Nom);
+            case Ui::MettrePret:
+                emit MettrePret(m_Nom);
                 break;
-            case Ui::GameJoin:
-                if (!GameAssigned)
-                    emit JoinRequest(this, Data.remove(0,1).split('\n'));
+            case Ui::JoinPartie:
+                if (!m_PartieAssignee)
+                    emit DemandeJoindre(this, Donnees.remove(0,1).split('\n'));
                 break;
-            case Ui::GameCreate:
-                emit CreateRequest(Data.remove(0,1).split('\n'));
+            case Ui::CreePartie:
+                emit DemandeCreation(Donnees.remove(0,1).split('\n'));
                 break;
-            case Ui::GameQuit:
-                emit GameQuit(Nom);
+            case Ui::QuitterPartie:
+                emit QuitterPartie(m_Nom);
                 break;
         }
     }
@@ -64,84 +64,84 @@ QByteArray thJoueurs::ToQByteArray(int Longueur)
     Res.append(QByteArray(1, (char)(Longueur)));
     return  Res;
 }
-void thJoueurs::GamesRequestReply(thJoueurs *sender, QString Reply)
+void thJoueurs::ReponseADemandeParties(thJoueurs *Concerne, QString Reponse)
 {
-    if (this == sender || sender == 0)
+    if (this == Concerne || Concerne == 0)
     {
-        QByteArray reply = QByteArray(1, Ui::GamesReply);
-        reply.append(Reply);
+        QByteArray envoi = QByteArray(1, Ui::ReponseParties);
+        envoi.append(Reponse);
 
-        reply.insert(0, ToQByteArray(reply.count()));
-        SocketClient->write(reply);
-        SocketClient->waitForBytesWritten();
+        envoi.insert(0, ToQByteArray(envoi.count()));
+        m_SocketClient->write(envoi);
+        m_SocketClient->waitForBytesWritten();
     }
 }
 
-void thJoueurs::PlayersReply(thJoueurs *sender, QString Reply)
+void thJoueurs::JoueursPartie(thJoueurs *Concerne, QString Reponse)
 {
-    if (this == sender)
+    if (this == Concerne)
     {
-        QByteArray reply = QByteArray(1, Ui::GamePlayers);
-        reply.append(Reply);
+        QByteArray envoi = QByteArray(1, Ui::JoueursPartie);
+        envoi.append(Reponse);
 
-        reply.insert(0, ToQByteArray(reply.count()));
-        SocketClient->write(reply);
-        SocketClient->waitForBytesWritten();
+        envoi.insert(0, ToQByteArray(envoi.count()));
+        m_SocketClient->write(envoi);
+        m_SocketClient->waitForBytesWritten();
     }
 }
 
-void thJoueurs::GameBegin(QByteArray Initialisation)
+void thJoueurs::DebutPartie(QByteArray Initialisation)
 {
-    QByteArray reply = QByteArray(1, Ui::GameBegin);
+    QByteArray envoi = QByteArray(1, Ui::DebutPartie);
 
-    reply.insert(0, ToQByteArray(reply.count()));
-    SocketClient->write(reply);
-    SocketClient->waitForBytesWritten();
-    reply = QByteArray(1, Ui::GameSData);
-    reply.append(Initialisation);
+    envoi.insert(0, ToQByteArray(envoi.count()));
+    m_SocketClient->write(envoi);
+    m_SocketClient->waitForBytesWritten();
+    envoi = QByteArray(1, Ui::DonneesServeur);
+    envoi.append(Initialisation);
 
-    reply.insert(0, ToQByteArray(reply.count()));
-    SocketClient->write(reply);
-    SocketClient->waitForBytesWritten();
+    envoi.insert(0, ToQByteArray(envoi.count()));
+    m_SocketClient->write(envoi);
+    m_SocketClient->waitForBytesWritten();
 }
 
-void thJoueurs::GameEnd(QByteArray Donnees, QString NomPartie)
+void thJoueurs::FinPartie(QByteArray Donnees, QString NomPartie)
 {
-    QByteArray reply1 = QByteArray(1, Ui::GameSData);
-    reply1.append(Donnees);
-    reply1.insert(0, ToQByteArray(reply1.count()));
+    QByteArray envoi1 = QByteArray(1, Ui::DonneesServeur);
+    envoi1.append(Donnees);
+    envoi1.insert(0, ToQByteArray(envoi1.count()));
 
-    QByteArray reply2 = QByteArray(1, Ui::GameEnd);
-    reply2.insert(0, ToQByteArray(reply2.count()));
+    QByteArray envoi2 = QByteArray(1, Ui::FinPartie);
+    envoi2.insert(0, ToQByteArray(envoi2.count()));
 
-    QByteArray reply;
+    QByteArray envoi;
     if (Donnees != 0)
-        reply.append(reply1);
-    reply.append(reply2);
-    GameAssigned = false;
+        envoi.append(envoi1);
+    envoi.append(envoi2);
+    m_PartieAssignee = false;
 
-    SocketClient->write(reply);
-    SocketClient->waitForBytesWritten();
+    m_SocketClient->write(envoi);
+    m_SocketClient->waitForBytesWritten();
 }
 
-void thJoueurs::GameSData(QByteArray Data)
+void thJoueurs::DonneesServeur(QByteArray Donnees)
 {
-    QByteArray reply = QByteArray(1, Ui::GameSData);
-    reply.append(Data);
+    QByteArray envoi = QByteArray(1, Ui::DonneesServeur);
+    envoi.append(Donnees);
 
-    reply.insert(0, ToQByteArray(reply.count()));
-    SocketClient->write(reply);
-    SocketClient->waitForBytesWritten();
+    envoi.insert(0, ToQByteArray(envoi.count()));
+    m_SocketClient->write(envoi);
+    m_SocketClient->waitForBytesWritten();
 }
 
-void thJoueurs::SocketClient_Disconnected()
+void thJoueurs::m_SocketClient_Disconnected()
 {
     emit Disconnected((this));
 }
 
-void thJoueurs::PlayersUpdate(QByteArray PlayersList)
+void thJoueurs::MetAJourJoueurs(QByteArray ListeJoueurs)
 {
-    PlayersList.insert(0, ToQByteArray(PlayersList.count()));
-    SocketClient->write(PlayersList);
-    SocketClient->waitForBytesWritten();
+    ListeJoueurs.insert(0, ToQByteArray(ListeJoueurs.count()));
+    m_SocketClient->write(ListeJoueurs);
+    m_SocketClient->waitForBytesWritten();
 }

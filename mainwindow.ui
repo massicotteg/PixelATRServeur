@@ -24,7 +24,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Accepter/Refuser Nouvelles Connections</string>
+     <string>Refuser Nouvelles Connections</string>
     </property>
    </widget>
    <widget class="QLineEdit" name="txtPort">
@@ -35,6 +35,9 @@
       <width>113</width>
       <height>27</height>
      </rect>
+    </property>
+    <property name="text">
+     <string>60123</string>
     </property>
    </widget>
    <widget class="QLabel" name="label">
@@ -144,19 +147,6 @@
      <string>Kick</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="btnAppliquer">
-    <property name="geometry">
-     <rect>
-      <x>120</x>
-      <y>190</y>
-      <width>181</width>
-      <height>27</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Appliquer les modifications</string>
-    </property>
-   </widget>
    <widget class="QListWidget" name="lbParties">
     <property name="geometry">
      <rect>
@@ -170,7 +160,7 @@
    <widget class="QPushButton" name="btnDemarrer">
     <property name="geometry">
      <rect>
-      <x>20</x>
+      <x>100</x>
       <y>190</y>
       <width>93</width>
       <height>27</height>

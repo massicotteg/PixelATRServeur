@@ -8,12 +8,12 @@ class Armee
 public:
     Armee();
     Armee(QPoint);
-    QPoint aPosition;
-    QPointF pPosition;
-    QList<QPoint> Commandes;
-    int NbrPixels;
-    int BatailleEngagee;
-    void Move();
+    QPoint m_aPosition;
+    QPointF m_pPosition;
+    QList<QPoint> m_Commandes;
+    int m_NbrPixels;
+    int m_BatailleEngagee;
+    void Bouge();
 };
 
 class Base: public Armee
@@ -21,7 +21,7 @@ class Base: public Armee
 public:
     Base();
     Base(QPoint, int);
-    int ProductRate;
+    int TauxProduction;
 };
 
 #endif // ARMEE_H

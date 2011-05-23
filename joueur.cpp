@@ -1,10 +1,10 @@
 #include "joueur.h"
 
 Joueur::Joueur(){}
-Joueur::Joueur(QString NomJoueur, QPoint Position, int SpawnRate, QColor  CouleurJoueur)
+Joueur::Joueur(QString NomJoueur, QPoint Position, int tauxProduction, QColor  CouleurJoueur)
 {
-    Nom = NomJoueur;
-    jBase = new Base(Position, SpawnRate);
-    Couleur = CouleurJoueur;
-    Armees = QList<Armee *>();
+    m_Nom = NomJoueur;
+    m_jBase = new Base(Position, tauxProduction);
+    m_Couleur = CouleurJoueur;
+    m_Armees = QList<Armee *>();
 }

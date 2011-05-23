@@ -9,9 +9,9 @@ class Participant
 public:
     Participant();
     Participant(Joueur *, Armee *);
-    QList<Armee *> ListeArmees;
-    Joueur *Proprietaire;
-    double Efficacite;
+    QList<Armee *> m_ListeArmees;
+    Joueur *m_Proprietaire;
+    double m_Efficacite;
 };
 
 class Bataille
@@ -19,7 +19,7 @@ class Bataille
 public:
     Bataille();
     Bataille(Joueur *Joueur1, Armee *ArmeeJoueur1, Joueur *Joueur2, Armee *ArmeeJoueur2);
-    QList<Participant> ListeParticipants;
+    QList<Participant> m_ListeParticipants;
     void Tick(QList<Joueur *>);
     void AjouterParticipant(Joueur *joueur, Armee *armee);
 };

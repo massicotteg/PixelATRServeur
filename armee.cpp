@@ -3,43 +3,43 @@
 Armee::Armee(){}
 Base::Base(){}
 
-Armee::Armee(QPoint StartPosition)
+Armee::Armee(QPoint Position)
 {
-    aPosition = StartPosition;
-    pPosition = aPosition;
-    NbrPixels = 100;
-    Commandes = QList<QPoint>();
-    BatailleEngagee = -1;
+    m_aPosition = Position;
+    m_pPosition = m_aPosition;
+    m_NbrPixels = 100;
+    m_Commandes = QList<QPoint>();
+    m_BatailleEngagee = -1;
 }
 
-void Armee::Move()
+void Armee::Bouge()
 {
     float varx, vary, distance, DepDist = 7.5;
 
-    while (Commandes.count() > 0 && DepDist > 0)
+    while (m_Commandes.count() > 0 && DepDist > 0)
     {
-        distance = sqrt(pow(Commandes[0].x() - pPosition.x(),2) + pow(Commandes[0].y() - pPosition.y(),2));
+        distance = sqrt(pow(m_Commandes[0].x() - m_pPosition.x(),2) + pow(m_Commandes[0].y() - m_pPosition.y(),2));
         if (distance > DepDist)
         {
-            varx = (Commandes[0].x() - pPosition.x()) * DepDist / distance;
-            vary = (Commandes[0].y() - pPosition.y()) * DepDist / distance;
+            varx = (m_Commandes[0].x() - m_pPosition.x()) * DepDist / distance;
+            vary = (m_Commandes[0].y() - m_pPosition.y()) * DepDist / distance;
             DepDist = 0;
         }
         else
         {
-            varx = (Commandes[0].x() - pPosition.x());
-            vary = (Commandes[0].y() - pPosition.y());
+            varx = (m_Commandes[0].x() - m_pPosition.x());
+            vary = (m_Commandes[0].y() - m_pPosition.y());
             DepDist-=distance;
-            Commandes.removeAt(0);
+            m_Commandes.removeAt(0);
         }
-        pPosition.setX(pPosition.x() + varx);
-        pPosition.setY(pPosition.y() + vary);
+        m_pPosition.setX(m_pPosition.x() + varx);
+        m_pPosition.setY(m_pPosition.y() + vary);
     }
-    aPosition = pPosition.toPoint();
+    m_aPosition = m_pPosition.toPoint();
 }
 
-Base::Base(QPoint Position, int SpawnRate) : Armee(Position)
+Base::Base(QPoint Position, int tauxProduction) : Armee(Position)
 {
-    ProductRate = SpawnRate;
-    NbrPixels = 50;
+    TauxProduction = tauxProduction;
+    m_NbrPixels = 50;
 }

@@ -10,33 +10,33 @@ class thJeu: public QObject
     Q_OBJECT
 public:
     explicit thJeu(QList<QByteArray> InitData);
-    QString NomPartie;
-    int NoMap;
-    int Tick;
-    QList<QString> Joueurs;
-    QList<bool> Ready;
-    QList<Joueur *> iJoueurs;
-    int SearchPlayer(QString);
-    QTimer *tTick;
+    QString m_NomPartie;
+    int m_NoMap;
+    int m_Tick;
+    QList<QString> m_NomJoueurs;
+    QList<bool> m_Pret;
+    QList<Joueur *> m_Joueurs;
+    int ChercheJoueur(QString);
+    QTimer *m_tTick;
 
 private:
-    QList<Bataille> ListeBataille;
+    QList<Bataille> m_ListeBataille;
 
 signals:
-    void Destroy(QObject *);
-    void PlayersUpdate(QByteArray);
-    void GameBegin(QByteArray);
-    void GameEnd(QByteArray, QString);
-    void SendGameSData(QByteArray);
+    void Detruire(QObject *);
+    void MetAJourJoueurs(QByteArray);
+    void DebutPartie(QByteArray);
+    void FinPartie(QByteArray, QString);
+    void EnvoiDonneesServeur(QByteArray);
 
 public slots:
-    void InitGame();
+    void InitPartie();
     void TickTimeOut();
-    void ExcludePlayer(QString);
-    void CumReady(QString);
-    void PlayersUpdate();
-    void PlayersData(QString, QByteArray);
-    void EndGame(QByteArray, QString);
+    void ExclureJoueur(QString);
+    void CumPret(QString);
+    void MetAJourJoueurs();
+    void DonneesJoueurs(QString, QByteArray);
+    void TerminePartie(QByteArray, QString);
 };
 
 #endif // THJEU_H

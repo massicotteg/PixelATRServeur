@@ -6,121 +6,125 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    Parties = QList<thJeu *>();
-    AcceptNewConnections = true;
+    m_Parties = QList<thJeu *>();
+    m_AccepteNouvellesConnexions = true;
 
-    TCPServeur = new QTcpServer();
-    connect(TCPServeur, SIGNAL(newConnection()), this, SLOT(TCPServeur_NewConnection()));
+    m_TCPServeur = new QTcpServer();
+    connect(m_TCPServeur, SIGNAL(newConnection()), this, SLOT(m_TCPServeur_NewConnection()));
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
-    delete TCPServeur;
+    delete m_TCPServeur;
 }
 
-thJeu *MainWindow::SearchGame(QString Nom)
+thJeu *MainWindow::CherchePartie(QString Nom)
 {
     int I = 0;
-    while (I < Parties.count() && Parties[I]->NomPartie != Nom)
+    while (I < m_Parties.count() && m_Parties[I]->m_NomPartie != Nom && m_Parties[I]->m_NomPartie != Nom + "D")
         I++;
-    if (I < Parties.count())
-        return Parties[I];
+    if (I < m_Parties.count())
+        return m_Parties[I];
     else
         return 0;
 }
 
-void MainWindow::TCPServeur_NewConnection()
+void MainWindow::m_TCPServeur_NewConnection()
 {
-    if (AcceptNewConnections)
+    if (m_AccepteNouvellesConnexions)
     {
-        tempthread = new thJoueurs(TCPServeur->nextPendingConnection());
-        connect(tempthread, SIGNAL(Disconnected(QObject *)), this, SLOT(CloseThreads(QObject *)));
-        connect(tempthread, SIGNAL(GamesRequest(thJoueurs *)), this, SLOT(thJoueurs_GamesRequest(thJoueurs*)));
-        connect(this, SIGNAL(GamesRequestReply(thJoueurs *, QString)), tempthread, SLOT(GamesRequestReply(thJoueurs *, QString)));
-        connect(tempthread, SIGNAL(CreateRequest(QList<QByteArray>)), this, SLOT(GameCreate(QList<QByteArray>)));
-        connect(tempthread, SIGNAL(JoinRequest(thJoueurs*,QList<QByteArray>)), this, SLOT(GameJoin(thJoueurs*,QList<QByteArray>)));
-        connect(this, SIGNAL(EndGame(QByteArray,QString)), tempthread, SLOT(GameEnd(QByteArray,QString)));
+        m_tempthread = new thJoueurs(m_TCPServeur->nextPendingConnection());
+        connect(m_tempthread, SIGNAL(Disconnected(QObject *)), this, SLOT(FermeObjets(QObject *)));
+        connect(m_tempthread, SIGNAL(DemandeParties(thJoueurs *)), this, SLOT(thJoueurs_DemandeParties(thJoueurs*)));
+        connect(this, SIGNAL(ReponseADemandeParties(thJoueurs *, QString)), m_tempthread, SLOT(ReponseADemandeParties(thJoueurs *, QString)));
+        connect(m_tempthread, SIGNAL(DemandeCreation(QList<QByteArray>)), this, SLOT(CreePartie(QList<QByteArray>)));
+        connect(m_tempthread, SIGNAL(DemandeJoindre(thJoueurs*,QList<QByteArray>)), this, SLOT(JoinPartie(thJoueurs*,QList<QByteArray>)));
+        connect(this, SIGNAL(TerminePartie(QByteArray,QString)), m_tempthread, SLOT(FinPartie(QByteArray,QString)));
     }
     else
-        TCPServeur->nextPendingConnection()->abort();
+        m_TCPServeur->nextPendingConnection()->abort();
 }
 
-void MainWindow::GameCreate(QList<QByteArray>Data)
+void MainWindow::CreePartie(QList<QByteArray>Data)
 {
-    if (SearchGame(Data[0]) == 0)
+    if (CherchePartie(Data[0]) == 0 && (ui->txtMaxParties->text().toInt() == 0 || ui->txtMaxParties->text().toInt() > ui->lbParties->count()))
     {
         thJeu *Temp = new thJeu(Data);
-        Parties.append(Temp);
-        ui->lbParties->addItem(Temp->NomPartie);
+        m_Parties.append(Temp);
+        ui->lbParties->addItem(Temp->m_NomPartie);
 
-        connect(this, SIGNAL(PlayerAdded()), Temp, SLOT(PlayersUpdate()));
-        connect(this, SIGNAL(KickGame(QByteArray, QString)), Temp, SLOT(EndGame(QByteArray, QString)));
-        connect(Temp, SIGNAL(Destroy(QObject*)), this, SLOT(CloseThreads(QObject*)));
+        connect(this, SIGNAL(JoueurAjoute()), Temp, SLOT(MetAJourJoueurs()));
+        connect(this, SIGNAL(KickPartie(QByteArray, QString)), Temp, SLOT(TerminePartie(QByteArray, QString)));
+        connect(Temp, SIGNAL(Detruire(QObject*)), this, SLOT(FermeObjets(QObject*)));
     }
 }
 
-void MainWindow::GameJoin(thJoueurs *Joueur, QList<QByteArray> Data)
+void MainWindow::JoinPartie(thJoueurs *Joueur, QList<QByteArray> Data)
 {
-    thJeu *Partie = SearchGame(Data[1]);
+    thJeu *Partie = CherchePartie(Data[1]);
 
-    if (Partie->SearchPlayer(Data[0]) == Partie->Joueurs.count() && Partie->Joueurs.count() < 4)
+    if (Partie->ChercheJoueur(Data[0]) == Partie->m_NomJoueurs.count() && Partie->m_NomJoueurs.count() < 4)
     {
-        Partie->Joueurs.append(Data[0]);
-        Joueur->Nom = Data[0];
-        Partie->Ready.append(false);
+        Partie->m_NomJoueurs.append(Data[0]);
+        Joueur->m_Nom = Data[0];
+        Partie->m_Pret.append(false);
 
-        connect(Partie, SIGNAL(GameBegin(QByteArray)), Joueur, SLOT(GameBegin(QByteArray)));
-        connect(Partie, SIGNAL(SendGameSData(QByteArray)), Joueur, SLOT(GameSData(QByteArray)));
-        connect(Partie, SIGNAL(PlayersUpdate(QByteArray)), Joueur, SLOT(PlayersUpdate(QByteArray)));
-        connect(Joueur, SIGNAL(GameQuit(QString)), Partie, SLOT(ExcludePlayer(QString)));
-        connect(Joueur, SIGNAL(SetReady(QString)), Partie, SLOT(CumReady(QString)));
-        connect(Joueur, SIGNAL(GameData(QString,QByteArray)), Partie, SLOT(PlayersData(QString,QByteArray)));
-        connect(Partie, SIGNAL(GameEnd(QByteArray, QString)), Joueur, SLOT(GameEnd(QByteArray, QString)));
-        connect(Partie, SIGNAL(GameEnd(QByteArray, QString)), this, SLOT(DelGame(QByteArray, QString)));
+        connect(Partie, SIGNAL(DebutPartie(QByteArray)), Joueur, SLOT(DebutPartie(QByteArray)));
+        connect(Partie, SIGNAL(EnvoiDonneesServeur(QByteArray)), Joueur, SLOT(DonneesServeur(QByteArray)));
+        connect(Partie, SIGNAL(MetAJourJoueurs(QByteArray)), Joueur, SLOT(MetAJourJoueurs(QByteArray)));
+        connect(Joueur, SIGNAL(QuitterPartie(QString)), Partie, SLOT(ExclureJoueur(QString)));
+        connect(Joueur, SIGNAL(MettrePret(QString)), Partie, SLOT(CumPret(QString)));
+        connect(Joueur, SIGNAL(DonneesPartie(QString,QByteArray)), Partie, SLOT(DonneesJoueurs(QString,QByteArray)));
+        connect(Partie, SIGNAL(FinPartie(QByteArray, QString)), Joueur, SLOT(FinPartie(QByteArray, QString)));
+        connect(Partie, SIGNAL(FinPartie(QByteArray, QString)), this, SLOT(SupPartie(QByteArray, QString)));
 
-        emit PlayerAdded();
+        emit JoueurAjoute();
     }
     else
-        emit EndGame(0,"");
+        emit TerminePartie(0,"");
 }
 
-void MainWindow::thJoueurs_GamesRequest(thJoueurs *Thread)
+void MainWindow::thJoueurs_DemandeParties(thJoueurs *Thread)
 {
    QString Parties = "";
    for (int I = 0; I < ui->lbParties->count(); I++)
-    Parties += ui->lbParties->item(I)->text() + "\n";
-   emit GamesRequestReply(Thread, Parties);
+       if (CherchePartie(ui->lbParties->item(I)->text()) != 0)
+            Parties += ui->lbParties->item(I)->text() + "\n";
+   emit ReponseADemandeParties(Thread, Parties);
 }
 
-void MainWindow::CloseThreads(QObject *objet)
+void MainWindow::FermeObjets(QObject *objet)
 {
     delete objet;
 }
 
-void MainWindow::on_btnAppliquer_clicked()
-{
-
-}
-
 void MainWindow::on_btnDemarrer_clicked()
 {
-    ui->btnDemarrer->setEnabled(false);
-    ui->txtPort->setEnabled(false);
-    ui->txtMaxParties->setEnabled(false);
-
-    TCPServeur->listen(QHostAddress::Any, ui->txtPort->text().toInt());
+    if (ui->txtPort->text().toInt() != 0 && m_TCPServeur->listen(QHostAddress::Any, ui->txtPort->text().toInt()))
+    {
+        ui->btnDemarrer->setEnabled(false);
+        ui->txtPort->setEnabled(false);
+        ui->txtMaxParties->setEnabled(false);
+    }
+    else
+        QMessageBox::warning(this, "Attention !!", "Le Serveur n'a pu demarrer sur le port choisi ! Veuillez en choisir un autre.", QMessageBox::Ok, 0);
 }
 
 void MainWindow::on_btnDemarrerArreter_clicked()
 {
-    AcceptNewConnections = !AcceptNewConnections;
+    if (ui->btnDemarrerArreter->text() == "Refuser Nouvelles Connections")
+        ui->btnDemarrerArreter->setText("Accepter Nouvelles Connections");
+    else
+        ui->btnDemarrerArreter->setText("Refuser Nouvelles Connections");
+
+    m_AccepteNouvellesConnexions = !m_AccepteNouvellesConnexions;
 }
 
 void MainWindow::on_btnKick_clicked()
 {
-    emit KickGame(0, ui->lbParties->item(ui->lbParties->currentRow())->text());
-    Parties.removeAt(ui->lbParties->currentRow());
+    emit KickPartie(0, ui->lbParties->item(ui->lbParties->currentRow())->text());
+    m_Parties.removeAt(ui->lbParties->currentRow());
     delete ui->lbParties->currentItem();
 }
 
@@ -132,9 +136,9 @@ void MainWindow::on_lbParties_currentRowChanged(int currentRow)
         ui->btnKick->setEnabled(false);
 }
 
-void MainWindow::DelGame(QByteArray Donnees, QString NomPartie)
+void MainWindow::SupPartie(QByteArray Donnees, QString NomPartie)
 {
-    QList<QListWidgetItem *> temp = ui->lbParties->findItems(NomPartie, Qt::MatchCaseSensitive);
+    QList<QListWidgetItem *> temp = ui->lbParties->findItems(NomPartie.remove(NomPartie.length()-1,1), Qt::MatchCaseSensitive);
     if (temp.count() > 0)
-        temp[0]->setText(NomPartie+" Terminé");
+        temp[0]->setText(NomPartie+" Termine");
 }

@@ -7,8 +7,8 @@ namespace Ui
     class thJoueurs;
     class thJeu;
 
-    enum CodesClients { GamesRequest, GameCreate, GameJoin, GameSetReady, GameCData, GameQuit};
-    enum CodesServeurs { GamesReply, GamePlayers, GameBegin, GameSData, GameEnd };
+    enum CodesClients { DemandeParties, CreePartie, JoinPartie, MettrePret, DonneesClient, QuitterPartie};
+    enum CodesServeurs { ReponseParties, JoueursPartie, DebutPartie, DonneesServeur, FinPartie };
 }
 
 #endif // NAMESPACE_H

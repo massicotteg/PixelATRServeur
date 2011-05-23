@@ -9,36 +9,36 @@ class thJoueurs : public QObject
 {
     Q_OBJECT
 public:
-    explicit thJoueurs(QTcpSocket *socketClient=0);
+    explicit thJoueurs(QTcpSocket *socketClient);
     ~thJoueurs();
-    QString Nom;
+    QString m_Nom;
 
 private:
     QByteArray ToQByteArray(int);
     int ToInt(QByteArray);
-    QTcpSocket *SocketClient;
-    bool GameAssigned;
+    QTcpSocket *m_SocketClient;
+    bool m_PartieAssignee;
 
 signals:
     void Disconnected(QObject *);
 
-    void GamesRequest(thJoueurs *);
-    void CreateRequest(QList<QByteArray>);
-    void JoinRequest(thJoueurs *, QList<QByteArray>);
-    void SetReady(QString);
-    void GameData(QString, QByteArray);
-    void GameQuit(QString);
+    void DemandeParties(thJoueurs *);
+    void DemandeCreation(QList<QByteArray>);
+    void DemandeJoindre(thJoueurs *, QList<QByteArray>);
+    void MettrePret(QString);
+    void DonneesPartie(QString, QByteArray);
+    void QuitterPartie(QString);
 
 public slots:
-    void SocketClient_ReadyRead();
-    void SocketClient_Disconnected();
-    void GamesRequestReply(thJoueurs *, QString);
+    void m_SocketClient_ReadyRead();
+    void m_SocketClient_Disconnected();
+    void ReponseADemandeParties(thJoueurs *, QString);
 
-    void PlayersUpdate(QByteArray);
-    void PlayersReply(thJoueurs *, QString);
-    void GameBegin(QByteArray);
-    void GameEnd(QByteArray, QString);
-    void GameSData(QByteArray);
+    void MetAJourJoueurs(QByteArray);
+    void JoueursPartie(thJoueurs *, QString);
+    void DebutPartie(QByteArray);
+    void FinPartie(QByteArray, QString);
+    void DonneesServeur(QByteArray);
 };
 
 #endif // THJOUEURS_H
